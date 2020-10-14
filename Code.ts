@@ -28,13 +28,15 @@ function syncColumns() {
 
     Logger.log('toSheet.getLastRow:' + toSheet.getLastRow() + " : rangelength" + toRange.getValues().length + " < " + values.length);
   while (toSheet.getLastRow() - 1 < values.length) {
-    var emptyRow = new Array(fromSheet.getLastColumn());
+    // Make the row as long as it could possibly get, if none of the columns in fromSheet matched the ones in toSheet.
+    var emptyRow = new Array(fromSheet.getLastColumn() + toSheet.getLastColumn());
     emptyRow[0] = 'EMPTY';
     emptyRow[emptyRow.length - 1] = 'EMPTY';
     toSheet.appendRow(emptyRow);
     Logger.log('Append emptry row ' + emptyRow.length);
   }
   toRange = toSheet.getDataRange();
+  Logger.log('toRange.getLastRow:' + toRange.getLastRow() + " : getLastColumn" + toRange.getLastColumn());
 
   // This logs the spreadsheet in CSV format with a trailing comma
   var fromHeaders = values[0];
@@ -55,6 +57,7 @@ function syncColumns() {
       }
       Logger.log('updating ' + curRowIdx + ':' + colIdx + ' with ' + values[i][j]);
       var cell = toRange.getCell(curRowIdx + 1, colIdx + 1);
+      Logger.log('updating cell ' + cell);
       cell.setValue(values[i][j]);
     }
     curRowIdx++;
