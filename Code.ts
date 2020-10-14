@@ -29,15 +29,15 @@ function syncColumns() {
   var headerValues = [];
   for (var i = 0; i < values.length; i++) {
     for (var j = 0; j < values[i].length; j++) {
-        var colIdx = headerToColumnIndex[fromHeaders[j]];
-        if (!colIdx && colIdx !== 0) {
-            // new answer, add to end
-            colIdx = ++lastColIdx;
-            headerToColumnIndex[fromHeaders[j]] = colIdx;
-            Logger.log('Adding new column header ' + fromHeaders[j]);
-        }
+      var colIdx = headerToColumnIndex[fromHeaders[j]];
+      if (!colIdx && colIdx !== 0) {
+          // new answer, add to end
+          colIdx = ++lastColIdx;
+          headerToColumnIndex[fromHeaders[j]] = colIdx;
+          Logger.log('Adding new column header ' + fromHeaders[j]);
       }
     }
+  }
   for (var header in headerToColumnIndex) {
     headerValues[headerToColumnIndex[header]] = header;
   }
@@ -54,7 +54,7 @@ function syncColumns() {
   }
 
   Logger.log(headerToColumnIndex);
-  var curRowIdx = 1; // TODO: find first blank/non-synced row
+  var curRowIdx = 1; // TODO: find first blank/non-synced row?
 
   toRange = toSheet.getRange(1, 1, toSheet.getMaxRows(), toSheet.getMaxColumns());
   Logger.log('toRange.getLastRow:' + toRange.getLastRow() + " : getLastColumn" + toRange.getLastColumn());
@@ -63,20 +63,20 @@ function syncColumns() {
   var toValues = toRange.getValues();
   Logger.log('toValues:' + toValues.length + " : " + toValues[0].length);
   for (var i = curRowIdx; i < values.length; i++) {
-      var row = "";
-      for (var j = 0; j < values[i].length; j++) {
-          if (values[i][j]) {
-              row = row + values[i][j];
-          }
-          row = row + ",";
-          var colIdx = headerToColumnIndex[fromHeaders[j]];
-          Logger.log('updating ' + curRowIdx + ':' + colIdx + ' with ' + values[i][j]);
-          // var cell = toRange.getCell(curRowIdx + 1, colIdx + 1);
-          // Logger.log('updating cell ' + cell.getValue());
-          toValues[curRowIdx][colIdx] = values[i][j];
+    var row = "";
+    for (var j = 0; j < values[i].length; j++) {
+      if (values[i][j]) {
+          row = row + values[i][j];
       }
-      curRowIdx++;
-      Logger.log(row);
+      row = row + ",";
+      var colIdx = headerToColumnIndex[fromHeaders[j]];
+      Logger.log('updating ' + curRowIdx + ':' + colIdx + ' with ' + values[i][j]);
+      // var cell = toRange.getCell(curRowIdx + 1, colIdx + 1);
+      // Logger.log('updating cell ' + cell.getValue());
+      toValues[curRowIdx][colIdx] = values[i][j];
+    }
+    curRowIdx++;
+    Logger.log(row);
   }
 
 
