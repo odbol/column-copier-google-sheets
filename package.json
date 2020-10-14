@@ -1,0 +1,13 @@
+{
+  "name": "column-copier",
+  "version": "1.0.0",
+  "description": "App Script for Google Sheets that syncs columns from one sheet to a different sheet",
+  "main": "Code.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tyler Freeman <github@odbol.com>",
+  "license": "ISC"
+}
