@@ -96,7 +96,7 @@ function syncColumns() {
 
   var curRowIdx = 1; // TODO: find first blank/non-synced row?
 
-  var toRange = toSheet.getRange(1, 1, toSheet.getMaxRows(), toSheet.getMaxColumns());
+  var toRange = toSheet.getRange(1, 1, values.length, toSheet.getMaxColumns());
   Logger.log('toRange.getLastRow:' + toRange.getLastRow() + " : getLastColumn" + toRange.getLastColumn());
 
   // Sync data
