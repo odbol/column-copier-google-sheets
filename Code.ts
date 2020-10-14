@@ -146,3 +146,8 @@ function getAvailableSheets() {
     .getSheets()
     .map(sheet => sheet.getName());
 }
+
+function saveSheets(fromSheet: string, toSheet: string) {
+  Logger.log(`saveSheets from: "${fromSheet}" to: "${toSheet}".`);
+  SpreadsheetApp.getUi().alert(`Saved from: "${fromSheet}" to: "${toSheet}".`);
+}

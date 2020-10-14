@@ -2,13 +2,51 @@
 <html>
   <head>
     <base target="_top">
+
+    <style type="text/css">
+label {
+  display: block;
+  margin: 10px;
+}
+
+    </style>
   </head>
   <body>
+    <p>Choose which sheets to sync column names and rows.</p>
+
+    <p>This script will take each column in the "From" sheet, and copy the data from each row over
+      to matching columns in the "To" sheet. If there is no matching column in the "To" sheet, it will
+      add it to the end.
+    </p>
+
     <? var data = getAvailableSheets() ?>
-    <select>
-      <? for (var i = 0; i < data.length; i++) { ?>
-        <option><?= data[i] ?></option>
-      <? } ?>
-    </select>
+
+    <label>Copy columns and data <strong>from</strong>:
+      <select name="fromSheet" id="fromSheet">
+        <? for (var i = 0; i < data.length; i++) { ?>
+          <option><?= data[i] ?></option>
+        <? } ?>
+      </select>
+    </label>
+
+    <label><strong>To:</strong>
+      <select name="toSheet" id="toSheet">
+        <? for (var i = 0; i < data.length; i++) { ?>
+          <option><?= data[i] ?></option>
+        <? } ?>
+      </select>
+    </label>
+
+
+<script>
+function save() {
+  var fromSheet = document.getElementById('fromSheet').value;
+  var toSheet = document.getElementById('toSheet').value;
+  google.script.run.saveSheets(fromSheet, toSheet);
+}
+
+</script>
+
+    <button onclick="save()">Save</button>
   </body>
 </html>
