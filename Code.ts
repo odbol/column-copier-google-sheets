@@ -14,7 +14,6 @@ function onOpen() {
 function getFromSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   return activeSpreadsheet.getSheetByName("Form Responses 4");
-
 }
 
 function getToSheet(): GoogleAppsScript.Spreadsheet.Sheet {
@@ -45,16 +44,17 @@ function createHeaderToColumnIndex(toSheet: GoogleAppsScript.Spreadsheet.Sheet, 
   var toRange = toSheet.getDataRange();
   var headerToColumnIndex = {};
   var toHeaders = toRange.getValues()[0];
-  var lastColIdx = 0;
+  var lastOriginalToColIdx = 0;
   for (var i = 0; i < toHeaders.length; i++) {
     if (toHeaders[i] && toHeaders[i].length > 0) {
       headerToColumnIndex[toHeaders[i]] = i;
-      lastColIdx = Math.max(lastColIdx, i);
+      lastOriginalToColIdx = Math.max(lastOriginalToColIdx, i);
     }
   }
 
   // get new headers and create rows to match
   var headerValues = [];
+  var lastColIdx = lastOriginalToColIdx;
   for (var i = 0; i < values.length; i++) {
     for (var j = 0; j < values[i].length; j++) {
       var colIdx = headerToColumnIndex[fromHeaders[j]];
@@ -69,8 +69,13 @@ function createHeaderToColumnIndex(toSheet: GoogleAppsScript.Spreadsheet.Sheet, 
   for (var header in headerToColumnIndex) {
     headerValues[headerToColumnIndex[header]] = header;
   }
-  // TODO: set color on new headers so we can tell if there's something weird.
-  toSheet.getRange(1, 1, 1, headerValues.length).setValues([headerValues]);
+  const headerRange = toSheet.getRange(1, 1, 1, headerValues.length);
+  headerRange.setValues([headerValues]);
+  // Set color on new headers so we can tell if there's something weird.
+  const firstNewColIdex = lastOriginalToColIdx + 1;
+  if (headerValues.length - firstNewColIdex > 0) {
+    toSheet.getRange(1, firstNewColIdex + 1, 1, headerValues.length - firstNewColIdex).setBackgroundRGB(255, 210, 255);
+  }
 
   Logger.log(headerToColumnIndex);
 
