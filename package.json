@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "App Script for Google Sheets that syncs columns from one sheet to a different sheet",
   "main": "Code.js",
-  "dependencies": {},
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.16"
+  },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
