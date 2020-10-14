@@ -1,8 +1,8 @@
 /* Menu Options */
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  ui.createMenu('Options')
-      .addItem("Sync form responses Recruiter tab", 'syncColumns')
+  ui.createMenu('Column Sync')
+      .addItem("Sync form responses to Recruiter tab", 'syncColumns')
       .addToUi();
 }
 
@@ -11,7 +11,7 @@ function syncColumns() {
   var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var fromSheet = activeSpreadsheet.getSheetByName("Form Responses 4");
   var toSheet = activeSpreadsheet.getSheetByName("TESTSHEET");
-  
+
   var toRange = toSheet.getDataRange();
   var headerToColumnIndex = {};
   var toHeaders = toRange.getValues()[0];
@@ -60,6 +60,6 @@ function syncColumns() {
     curRowIdx++;
     Logger.log(row);
   }
-  
-  
+
+
 }
