@@ -3,15 +3,41 @@ function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('Column Sync')
       .addItem("Sync form responses to Recruiter tab", 'syncColumns')
+      .addSeparator()
+      .addSubMenu(
+        ui.createMenu("Admin")
+          .addItem("Set up columns", 'prepareInterstitialSheet')
+      )
       .addToUi();
 }
 
-function syncColumns() {
+function getFromSheet(): GoogleAppsScript.Spreadsheet.Sheet {
+  var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  return activeSpreadsheet.getSheetByName("Form Responses 4");
+
+}
+
+function getToSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   var spreadsheetName = "Form Responses (Transformed - Do not modify!)"
   var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var fromSheet = activeSpreadsheet.getSheetByName("Form Responses 4");
-  var toSheet = activeSpreadsheet.getSheetByName("TESTSHEET");
+  return activeSpreadsheet.getSheetByName("TESTSHEET");
+}
 
+function fillSheetWithEmptyRows(numRows: number, toSheet: GoogleAppsScript.Spreadsheet.Sheet, fromSheet: GoogleAppsScript.Spreadsheet.Sheet) {
+  // Ensure we have enough rows!
+  const numRowsToAdd = numRows - toSheet.getLastRow();
+  if (numRowsToAdd < 0) return;
+
+  // Because Sheets API is stupid, we need to insert a bunch of empty rows,
+  // then fill the last one with actual values so it can set the values on the empty ones later.
+  toSheet.insertRowsAfter(toSheet.getLastRow(), numRowsToAdd);
+  var emptyRow = new Array(fromSheet.getLastColumn() + toSheet.getLastColumn());
+  emptyRow[0] = 'EMPTY';
+  emptyRow[emptyRow.length - 1] = 'EMPTY';
+  toSheet.getRange(numRows, 1, 1, emptyRow.length).setValues([emptyRow]);
+}
+
+function createHeaderToColumnIndex(toSheet: GoogleAppsScript.Spreadsheet.Sheet, fromSheet: GoogleAppsScript.Spreadsheet.Sheet) {
   var range = fromSheet.getDataRange();
   var values = range.getValues();
   var fromHeaders = values[0];
@@ -21,8 +47,10 @@ function syncColumns() {
   var toHeaders = toRange.getValues()[0];
   var lastColIdx = 0;
   for (var i = 0; i < toHeaders.length; i++) {
-    headerToColumnIndex[toHeaders[i]] = i;
-    lastColIdx = Math.max(lastColIdx, i);
+    if (toHeaders[i] && toHeaders[i].length > 0) {
+      headerToColumnIndex[toHeaders[i]] = i;
+      lastColIdx = Math.max(lastColIdx, i);
+    }
   }
 
   // get new headers and create rows to match
@@ -44,19 +72,26 @@ function syncColumns() {
   // TODO: set color on new headers so we can tell if there's something weird.
   toSheet.getRange(1, 1, 1, headerValues.length).setValues([headerValues]);
 
-  while (toSheet.getLastRow() - 1 < values.length) {
-    // Add
-    var emptyRow = new Array(fromSheet.getLastColumn() + toSheet.getLastColumn());
-    emptyRow[0] = 'EMPTY';
-    emptyRow[emptyRow.length - 1] = 'EMPTY';
-    toSheet.appendRow(emptyRow);
-    Logger.log('Append emptry row ' + emptyRow.length);
-  }
-
   Logger.log(headerToColumnIndex);
+
+  return headerToColumnIndex;
+}
+
+
+function syncColumns() {
+  var fromSheet = getFromSheet();
+  var toSheet = getToSheet();
+
+
+  var range = fromSheet.getDataRange();
+  var values = range.getValues();
+  var fromHeaders = values[0];
+
+  var headerToColumnIndex = createHeaderToColumnIndex(toSheet, fromSheet);
+
   var curRowIdx = 1; // TODO: find first blank/non-synced row?
 
-  toRange = toSheet.getRange(1, 1, toSheet.getMaxRows(), toSheet.getMaxColumns());
+  var toRange = toSheet.getRange(1, 1, toSheet.getMaxRows(), toSheet.getMaxColumns());
   Logger.log('toRange.getLastRow:' + toRange.getLastRow() + " : getLastColumn" + toRange.getLastColumn());
 
   // Sync data
@@ -82,4 +117,14 @@ function syncColumns() {
 
   toSheet.getRange(1, 1, toValues.length, toValues[0].length).setValues(toValues);
 
+}
+
+
+function prepareInterstitialSheet() {
+  var fromSheet = getFromSheet();
+  var toSheet = getToSheet();
+
+  fillSheetWithEmptyRows(10000, toSheet, fromSheet);
+
+  createHeaderToColumnIndex(toSheet, fromSheet)
 }
