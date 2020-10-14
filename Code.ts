@@ -98,20 +98,12 @@ function syncColumns() {
   var toValues = toRange.getValues();
   Logger.log('toValues:' + toValues.length + " : " + toValues[0].length);
   for (var i = curRowIdx; i < values.length; i++) {
-    var row = "";
     for (var j = 0; j < values[i].length; j++) {
-      if (values[i][j]) {
-          row = row + values[i][j];
-      }
-      row = row + ",";
       var colIdx = headerToColumnIndex[fromHeaders[j]];
       Logger.log('updating ' + curRowIdx + ':' + colIdx + ' with ' + values[i][j]);
-      // var cell = toRange.getCell(curRowIdx + 1, colIdx + 1);
-      // Logger.log('updating cell ' + cell.getValue());
       toValues[curRowIdx][colIdx] = values[i][j];
     }
     curRowIdx++;
-    Logger.log(row);
   }
 
 
