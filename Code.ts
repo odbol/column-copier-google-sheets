@@ -12,6 +12,10 @@ function syncColumns() {
   var fromSheet = activeSpreadsheet.getSheetByName("Form Responses 4");
   var toSheet = activeSpreadsheet.getSheetByName("TESTSHEET");
 
+  var range = fromSheet.getDataRange();
+  var values = range.getValues();
+  var fromHeaders = values[0];
+
   var toRange = toSheet.getDataRange();
   var headerToColumnIndex = {};
   var toHeaders = toRange.getValues()[0];
@@ -20,49 +24,62 @@ function syncColumns() {
     headerToColumnIndex[toHeaders[i]] = i;
     lastColIdx = Math.max(lastColIdx, i);
   }
-  Logger.log(headerToColumnIndex);
-  var curRowIdx = 1; // TODO: find first blank/non-synced row
 
-  var range = fromSheet.getDataRange();
-  var values = range.getValues();
+  // get new headers and create rows to match
+  var headerValues = [];
+  for (var i = 0; i < values.length; i++) {
+    for (var j = 0; j < values[i].length; j++) {
+        var colIdx = headerToColumnIndex[fromHeaders[j]];
+        if (!colIdx && colIdx !== 0) {
+            // new answer, add to end
+            colIdx = ++lastColIdx;
+            headerToColumnIndex[fromHeaders[j]] = colIdx;
+            Logger.log('Adding new column header ' + fromHeaders[j]);
+        }
+      }
+    }
+  for (var header in headerToColumnIndex) {
+    headerValues[headerToColumnIndex[header]] = header;
+  }
+  // TODO: set color on new headers so we can tell if there's something weird.
+  toSheet.getRange(1, 1, 1, headerValues.length).setValues([headerValues]);
 
-    Logger.log('toSheet.getLastRow:' + toSheet.getLastRow() + " : rangelength" + toRange.getValues().length + " < " + values.length);
   while (toSheet.getLastRow() - 1 < values.length) {
-    // Make the row as long as it could possibly get, if none of the columns in fromSheet matched the ones in toSheet.
+    // Add
     var emptyRow = new Array(fromSheet.getLastColumn() + toSheet.getLastColumn());
     emptyRow[0] = 'EMPTY';
     emptyRow[emptyRow.length - 1] = 'EMPTY';
     toSheet.appendRow(emptyRow);
     Logger.log('Append emptry row ' + emptyRow.length);
   }
-  toRange = toSheet.getDataRange();
+
+  Logger.log(headerToColumnIndex);
+  var curRowIdx = 1; // TODO: find first blank/non-synced row
+
+  toRange = toSheet.getRange(1, 1, toSheet.getMaxRows(), toSheet.getMaxColumns());
   Logger.log('toRange.getLastRow:' + toRange.getLastRow() + " : getLastColumn" + toRange.getLastColumn());
 
-  // This logs the spreadsheet in CSV format with a trailing comma
-  var fromHeaders = values[0];
-  for (var i = 1; i < values.length; i++) {
-    var row = "";
-    for (var j = 0; j < values[i].length; j++) {
-      if (values[i][j]) {
-        row = row + values[i][j];
+  // Sync data
+  var toValues = toRange.getValues();
+  Logger.log('toValues:' + toValues.length + " : " + toValues[0].length);
+  for (var i = curRowIdx; i < values.length; i++) {
+      var row = "";
+      for (var j = 0; j < values[i].length; j++) {
+          if (values[i][j]) {
+              row = row + values[i][j];
+          }
+          row = row + ",";
+          var colIdx = headerToColumnIndex[fromHeaders[j]];
+          Logger.log('updating ' + curRowIdx + ':' + colIdx + ' with ' + values[i][j]);
+          // var cell = toRange.getCell(curRowIdx + 1, colIdx + 1);
+          // Logger.log('updating cell ' + cell.getValue());
+          toValues[curRowIdx][colIdx] = values[i][j];
       }
-      row = row + ",";
-
-      var colIdx = headerToColumnIndex[fromHeaders[j]];
-      if (!colIdx && colIdx !== 0) {
-        // new answer, add to end
-        // TODO
-        colIdx = ++lastColIdx;
-        headerToColumnIndex[fromHeaders[j]] = colIdx;
-      }
-      Logger.log('updating ' + curRowIdx + ':' + colIdx + ' with ' + values[i][j]);
-      var cell = toRange.getCell(curRowIdx + 1, colIdx + 1);
-      Logger.log('updating cell ' + cell);
-      cell.setValue(values[i][j]);
-    }
-    curRowIdx++;
-    Logger.log(row);
+      curRowIdx++;
+      Logger.log(row);
   }
 
+
+  toSheet.getRange(1, 1, toValues.length, toValues[0].length).setValues(toValues);
 
 }
