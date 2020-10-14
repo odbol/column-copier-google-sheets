@@ -6,6 +6,7 @@ function onOpen() {
       .addSeparator()
       .addSubMenu(
         ui.createMenu("Admin")
+          .addItem("Set up sheets", 'promptForSheetNames')
           .addItem("Set up columns", 'prepareInterstitialSheet')
       )
       .addToUi();
@@ -132,4 +133,16 @@ New headers found in the form that did not exist before are marked in pink. Plea
 
 You may now add cell references and VLOOKUPs in the Recuiter tab to point to cells in "${toSheet.getSheetName()}", which will be synced to the form responses.
   `);
+}
+
+function promptForSheetNames() {
+  var html = HtmlService.createTemplateFromFile('index').evaluate();
+  SpreadsheetApp.getUi()
+      .showModalDialog(html, 'Set up Column Sync');
+}
+
+function getAvailableSheets() {
+  return SpreadsheetApp.getActiveSpreadsheet()
+    .getSheets()
+    .map(sheet => sheet.getName());
 }

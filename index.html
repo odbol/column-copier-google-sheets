@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <? var data = getAvailableSheets() ?>
+    <select>
+      <? for (var i = 0; i < data.length; i++) { ?>
+        <option><?= data[i] ?></option>
+      <? } ?>
+    </select>
+  </body>
+</html>
