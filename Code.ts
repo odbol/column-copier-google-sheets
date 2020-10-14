@@ -114,6 +114,7 @@ function syncColumns() {
 
   toSheet.getRange(1, 1, toValues.length, toValues[0].length).setValues(toValues);
 
+  SpreadsheetApp.getUi().alert(`Synced ${values.length - 1} rows from ${fromSheet.getSheetName()}`);
 }
 
 
@@ -123,5 +124,12 @@ function prepareInterstitialSheet() {
 
   fillSheetWithEmptyRows(10000, toSheet, fromSheet);
 
-  createHeaderToColumnIndex(toSheet, fromSheet)
+  createHeaderToColumnIndex(toSheet, fromSheet);
+
+  SpreadsheetApp.getUi().alert(`Done copying headers from "${fromSheet.getSheetName()}" into "${toSheet.getSheetName()}".
+
+New headers found in the form that did not exist before are marked in pink. Please double-check them.
+
+You may now add cell references and VLOOKUPs in the Recuiter tab to point to cells in "${toSheet.getSheetName()}", which will be synced to the form responses.
+  `);
 }
