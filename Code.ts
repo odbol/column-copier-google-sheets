@@ -13,14 +13,24 @@ function onOpen() {
 }
 
 function getFromSheet(): GoogleAppsScript.Spreadsheet.Sheet {
+  const name = PropertiesService.getDocumentProperties().getProperty('fromSheet');
+  if (!name) {
+    promptForSheetNames();
+    return null;
+  }
+
   var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  return activeSpreadsheet.getSheetByName("Form Responses 4");
+  return activeSpreadsheet.getSheetByName(name);
 }
 
 function getToSheet(): GoogleAppsScript.Spreadsheet.Sheet {
-  var spreadsheetName = "Form Responses (Transformed - Do not modify!)"
+  const name = PropertiesService.getDocumentProperties().getProperty('toSheet');
+  if (!name) {
+    return null;
+  }
+
   var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  return activeSpreadsheet.getSheetByName("TESTSHEET");
+  return activeSpreadsheet.getSheetByName(name);
 }
 
 function fillSheetWithEmptyRows(numRows: number, toSheet: GoogleAppsScript.Spreadsheet.Sheet, fromSheet: GoogleAppsScript.Spreadsheet.Sheet) {
@@ -88,6 +98,7 @@ function syncColumns() {
   var fromSheet = getFromSheet();
   var toSheet = getToSheet();
 
+  if (!fromSheet || !toSheet) return;
 
   var range = fromSheet.getDataRange();
   var values = range.getValues();
@@ -123,6 +134,8 @@ function prepareInterstitialSheet() {
   var fromSheet = getFromSheet();
   var toSheet = getToSheet();
 
+  if (!fromSheet || !toSheet) return;
+
   fillSheetWithEmptyRows(10000, toSheet, fromSheet);
 
   createHeaderToColumnIndex(toSheet, fromSheet);
@@ -149,5 +162,11 @@ function getAvailableSheets() {
 
 function saveSheets(fromSheet: string, toSheet: string) {
   Logger.log(`saveSheets from: "${fromSheet}" to: "${toSheet}".`);
-  SpreadsheetApp.getUi().alert(`Saved from: "${fromSheet}" to: "${toSheet}".`);
+  //SpreadsheetApp.getUi().alert(`Saved from: "${fromSheet}" to: "${toSheet}".`);
+  PropertiesService.getDocumentProperties().setProperties({
+    fromSheet,
+    toSheet
+  });
+
+  prepareInterstitialSheet();
 }

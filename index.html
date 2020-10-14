@@ -3,6 +3,10 @@
   <head>
     <base target="_top">
 
+    body {
+      font-family: Arial, sans-serif;
+    }
+
     <style type="text/css">
 label {
   display: block;
@@ -43,6 +47,7 @@ function save() {
   var fromSheet = document.getElementById('fromSheet').value;
   var toSheet = document.getElementById('toSheet').value;
   google.script.run.saveSheets(fromSheet, toSheet);
+  google.script.host.close();
 }
 
 </script>
