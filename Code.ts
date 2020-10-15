@@ -2,7 +2,7 @@
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('Column Sync')
-      .addItem("Sync form responses to Recruiter tab", 'syncColumns')
+      .addItem("Sync all data now", 'syncColumns')
       .addSeparator()
       .addSubMenu(
         ui.createMenu("Admin")
