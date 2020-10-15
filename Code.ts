@@ -167,6 +167,4 @@ function saveSheets(fromSheet: string, toSheet: string) {
     fromSheet,
     toSheet
   });
-
-  prepareInterstitialSheet();
 }

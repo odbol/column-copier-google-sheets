@@ -15,9 +15,18 @@ label, select {
   margin: 10px;
 }
 
+.hidden {
+  display: none;
+}
+
+.shown {
+  display: block;
+}
+
     </style>
   </head>
   <body>
+   <div id="step1">
     <p>Choose which sheets to sync column names and rows.</p>
 
     <p>This script will take each column in the "From" sheet, and copy the data from each row over
@@ -49,12 +58,23 @@ function save() {
   var fromSheet = document.getElementById('fromSheet').value;
   var toSheet = document.getElementById('toSheet').value;
   google.script.run.saveSheets(fromSheet, toSheet);
-  google.script.host.close();
+
+  document.getElementById('step1').className = 'hidden';
+  document.getElementById('step2').className = 'shown';
 }
 
+function done() {
+  google.script.host.close();
+}
 </script>
 
     <p></p>
     <button onclick="save()">Save and prepare columns</button>
+   </div>
+
+   <div id="step2" class="hidden">
+    <p>Now close this window and click <code>Column Sync->Admin->Set up columns</code>.</p>
+    <button onclick="done()">Close</button>
+   </div>
   </body>
 </html>
