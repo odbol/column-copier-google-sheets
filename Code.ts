@@ -144,7 +144,7 @@ function prepareInterstitialSheet() {
 
 New headers found in the form that did not exist before are marked in pink. Please double-check them.
 
-You may now add cell references and VLOOKUPs in the Recuiter tab to point to cells in "${toSheet.getSheetName()}", which will be synced to the form responses.
+You may now add cell references and VLOOKUPs in other tabs to point to cells in "${toSheet.getSheetName()}", which will be synced to the form responses.
   `);
 }
 
